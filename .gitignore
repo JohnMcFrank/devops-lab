@@ -1,0 +1,17 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.crash
+*.backup
+
+# Ansible
+*.retry
+
+# SSH
+*.pem
+*.key
+
+# Misc
+*.iso
+*.img

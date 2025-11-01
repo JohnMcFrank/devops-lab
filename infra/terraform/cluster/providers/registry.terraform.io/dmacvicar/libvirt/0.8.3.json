@@ -1,0 +1,10 @@
+{
+  "archives": {
+    "linux_amd64": {
+      "hashes": [
+        "h1:Tttxr3E9O75MM+dDmq5sYHQEw29PwtIj+XDj/5drdfE="
+      ],
+      "url": "terraform-provider-libvirt_0.8.3_linux_amd64.zip"
+    }
+  }
+}
