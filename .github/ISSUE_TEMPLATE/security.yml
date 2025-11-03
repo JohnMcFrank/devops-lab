@@ -1,0 +1,16 @@
+name: "Sécurité"
+description: Ticket sécurité
+labels: ["Security","DevSecOps"]
+body:
+  - type: textarea
+    id: contexte
+    attributes: { label: Contexte }
+  - type: textarea
+    id: objectifs
+    attributes: { label: Objectifs mesurables (DoD/KPI) }
+  - type: textarea
+    id: taches
+    attributes: { label: Tâches / Sous-tâches }
+  - type: textarea
+    id: preuves
+    attributes: { label: Preuves (screens, logs, commandes) }
