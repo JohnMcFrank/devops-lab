@@ -1,0 +1,8 @@
+# Propriétaires code (à adapter: @JohnMcFrank ou équipe)
+* @JohnMcFrank
+
+# Dossiers sensibles (2 reviewers obligatoires via règles de branche)
+docs/ @JohnMcFrank
+infra/ @JohnMcFrank
+charts/ @JohnMcFrank
+.github/ @JohnMcFrank
