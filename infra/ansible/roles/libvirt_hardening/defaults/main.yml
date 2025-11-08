@@ -1,2 +1,2 @@
-cockpit_bind_ip: ""   #UFW filtre déjà
+cockpit_bind_ip: ""   #ufw filtre déjà
 polkit_user: "jd"
