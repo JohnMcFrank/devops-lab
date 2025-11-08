@@ -6,4 +6,4 @@ AuthenticationMethods {{ 'publickey,keyboard-interactive' if enable_totp else 'p
 PubkeyAuthentication yes
 MaxAuthTries {{ ssh_max_auth_tries }}
 LoginGraceTime {{ ssh_login_grace }}
-# Laisse les Ciphers/Kex par défaut OpenSSH (bonnes pratiques 24.04)
+# ciphers/kex par défaut openssh
