@@ -1,0 +1,9 @@
+# /etc/ssh/sshd_config.d/{{ ssh_dropin_filename }}
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication {{ 'yes' if enable_totp else 'no' }}
+AuthenticationMethods {{ 'publickey,keyboard-interactive' if enable_totp else 'publickey' }}
+PubkeyAuthentication yes
+MaxAuthTries {{ ssh_max_auth_tries }}
+LoginGraceTime {{ ssh_login_grace }}
+# Laisse les Ciphers/Kex par défaut OpenSSH (bonnes pratiques 24.04)

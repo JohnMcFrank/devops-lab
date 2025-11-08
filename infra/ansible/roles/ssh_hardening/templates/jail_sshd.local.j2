@@ -1,0 +1,9 @@
+[sshd]
+enabled = true
+port = ssh
+logpath = %(sshd_log)s
+backend = systemd
+maxretry = {{ f2b_sshd_maxretry }}
+findtime = {{ f2b_sshd_findtime }}
+bantime  = {{ f2b_sshd_bantime }}
+

@@ -1,0 +1,10 @@
+---
+- name: daemon-reload
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: restart cockpit
+  ansible.builtin.service:
+    name: cockpit.socket
+    state: restarted
+    enabled: yes

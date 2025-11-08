@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  connection: local
+  become: yes
+  roles:
+    - role: ssh_hardening
+    - role: libvirt_hardening

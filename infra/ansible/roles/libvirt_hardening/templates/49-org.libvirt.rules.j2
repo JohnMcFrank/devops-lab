@@ -1,0 +1,7 @@
+// /etc/polkit-1/rules.d/49-org.libvirt.rules
+polkit.addRule(function(action, subject) {
+  if (action.id == "org.libvirt.unix.manage" &&
+      subject.isInGroup("{{ polkit_user }}") || subject.user == "{{ polkit_user }}") {
+    return polkit.Result.YES;
+  }
+});

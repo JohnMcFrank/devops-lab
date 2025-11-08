@@ -1,0 +1,40 @@
+---
+- name: Groupe libvirt → s'assurer que {{ polkit_user }} est membre
+  ansible.builtin.user:
+    name: "{{ polkit_user }}"
+    groups: libvirt
+    append: yes
+
+- name: Polkit libvirt (user-only)
+  ansible.builtin.template:
+    src: 49-org.libvirt.rules.j2
+    dest: /etc/polkit-1/rules.d/49-org.libvirt.rules
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: UFW autoriser Cockpit seulement depuis admin_cidr
+  when: admin_cidr is defined and admin_cidr|length > 0
+  community.general.ufw:
+    rule: allow
+    port: '9090'
+    proto: tcp
+    src: "{{ admin_cidr }}"
+  notify: reload ufw
+
+- name: Override cockpit.socket (bind IP si fournie)
+  when: cockpit_bind_ip|length > 0
+  ansible.builtin.file:
+    path: /etc/systemd/system/cockpit.socket.d
+    state: directory
+    mode: '0755'
+
+- name: Déployer override de socket
+  when: cockpit_bind_ip|length > 0
+  ansible.builtin.template:
+    src: cockpit-override.conf.j2
+    dest: /etc/systemd/system/cockpit.socket.d/override.conf
+    mode: '0644'
+  notify:
+    - daemon-reload
+    - restart cockpit

@@ -1,0 +1,6 @@
+# /etc/systemd/system/cockpit.socket.d/override.conf
+[Socket]
+{% if cockpit_bind_ip|length > 0 %}
+ListenStream=
+ListenStream={{ cockpit_bind_ip }}:9090
+{% endif %}

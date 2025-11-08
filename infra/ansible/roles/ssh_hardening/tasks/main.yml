@@ -1,0 +1,76 @@
+---
+- name: Packages durcissement
+  ansible.builtin.apt:
+    name:
+      - openssh-server
+      - ufw
+      - fail2ban
+      - unattended-upgrades
+      - auditd
+      - libpam-google-authenticator
+    state: present
+    update_cache: yes
+
+- name: Unattended upgrades ON
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+  notify: []
+
+- name: Journald persistant
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^#?Storage='
+    line: 'Storage=persistent'
+  notify: []
+
+- name: Activer auditd
+  ansible.builtin.service:
+    name: auditd
+    state: started
+    enabled: yes
+
+- name: UFW défaut deny
+  community.general.ufw:
+    state: enabled
+    policy: deny
+
+- name: UFW allow SSH
+  block:
+    - name: Autoriser SSH pour chaque CIDR
+      community.general.ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+        src: "{{ item if item != 'any' else omit }}"
+      loop: "{{ ssh_allow_cidrs }}"
+  notify: reload ufw
+
+- name: Créer drop-in SSH
+  ansible.builtin.template:
+    src: sshd_dropin.j2
+    dest: "/etc/ssh/sshd_config.d/{{ ssh_dropin_filename }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart ssh
+
+- name: (Optionnel) brancher PAM Google Authenticator si enable_totp
+  when: enable_totp
+  ansible.builtin.blockinfile:
+    path: /etc/pam.d/sshd
+    insertafter: BOF
+    block: |
+      auth required pam_google_authenticator.so nullok
+
+- name: Fail2ban jail sshd
+  ansible.builtin.template:
+    src: jail_sshd.local.j2
+    dest: /etc/fail2ban/jail.d/sshd.local
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart fail2ban
+

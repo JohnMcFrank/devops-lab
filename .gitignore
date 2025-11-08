@@ -1,17 +1,32 @@
-# Terraform
-*.tfstate
-*.tfstate.*
-.terraform/
-.crash
-*.backup
+# Logs et sorties locales
+*.out
+*.log
+*.tmp
 
-# Ansible
+# Dossiers locaux de scripts (on garde un .gitkeep vide au besoin)
+scripts/*
+!scripts/.gitkeep
+lab/scripts/*
+!lab/scripts/.gitkeep
+
+# Artefacts Ansible
 *.retry
+.ansible/
 
-# SSH
-*.pem
-*.key
+# Logs et sorties locales
+*.out
+*.log
+*.tmp
 
-# Misc
-*.iso
-*.img
+# Dossiers locaux de travail
+/scripts/*
+!/scripts/.gitkeep
+/lab/scripts/*
+!/lab/scripts/.gitkeep
+
+# Ansible artefacts
+*.retry
+.ansible/
+
+# Terraform artefacts
+infra/terraform/**/.terraform/

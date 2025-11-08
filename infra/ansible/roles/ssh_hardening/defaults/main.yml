@@ -1,0 +1,3 @@
+ssh_dropin_filename: "99-hardening.conf"
+ssh_max_auth_tries: 3
+ssh_login_grace: 20

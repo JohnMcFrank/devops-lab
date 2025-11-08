@@ -1,0 +1,16 @@
+# Segment qui peut accéder à Cockpit (9090)
+admin_cidr: "10.10.10.0/24"
+
+# Liste(s) d'IP/CIDR autorisées en SSH (à défaut: partout)
+ssh_allow_cidrs:
+  - "10.10.10.0/24"
+  - "192.168.56.0/24"
+
+
+# Active le TOTP (PAM) pour SSH ? (false = clé seule)
+enable_totp: false
+
+# Fail2ban sshd
+f2b_sshd_maxretry: 3
+f2b_sshd_findtime: 600    # 10 min
+f2b_sshd_bantime: 3600    # 1h
