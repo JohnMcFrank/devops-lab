@@ -1,0 +1,22 @@
+# Groupes Unix normalisés
+ops_groups:
+  - ops-read
+  - ops-maint
+  - ops-admin
+
+# Utilisateurs à provisionner (vide par défaut → aucun changement)
+ops_users: []
+# - name: alice
+#   groups: [ops-read]
+#   ssh_pubkeys:
+#     - "ssh-ed25519 AAAA... alice@laptop"
+# - name: bob
+#   groups: [ops-maint]
+#   ssh_pubkeys:
+#     - "ssh-ed25519 AAAA... bob@work"
+
+# Emplacements des fragments sudoers
+sudo_profiles:
+  read:  "/etc/sudoers.d/10-ops-read"
+  maint: "/etc/sudoers.d/20-ops-maint"
+  admin: "/etc/sudoers.d/90-ops-admin"

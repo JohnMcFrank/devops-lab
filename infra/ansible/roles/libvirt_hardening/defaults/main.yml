@@ -1,2 +1,10 @@
-cockpit_bind_ip: ""   #ufw filtre déjà
-polkit_user: "jd"
+# Groupes par défaut pour les règles polkit libvirt
+polkit_admin_groups:
+  - ops-admin
+polkit_maint_groups:
+  - ops-maint
+polkit_read_groups:
+  - ops-read
+
+# IP de bind cockpit.socket (vide = par défaut)
+cockpit_bind_ip: ""

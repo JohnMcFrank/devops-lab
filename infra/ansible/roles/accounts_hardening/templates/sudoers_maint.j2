@@ -1,0 +1,6 @@
+# groupe: ops-maint, maintenance limitée (nopasswd sur périmètre restreint)
+%ops-maint ALL=(root) NOPASSWD: \
+  /bin/systemctl status *, \
+  /bin/systemctl restart *, \
+  /usr/bin/journalctl *, \
+  /usr/bin/virsh console *

@@ -1,0 +1,71 @@
+
+- name: Ensure 'sudo' package present
+  ansible.builtin.apt:
+    name: sudo
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Create Unix groups (ops-*)
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ ops_groups }}"
+  become: yes
+
+- name: Create users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups | join(',') }}"
+    append: yes
+    shell: /bin/bash
+    create_home: yes
+    state: present
+  loop: "{{ ops_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  become: yes
+
+- name: Install authorized_keys for each user
+  ansible.builtin.authorized_key:
+    user: "{{ item.0.name }}"
+    key: "{{ item.1 }}"
+    state: present
+    manage_dir: yes
+  with_subelements:
+    - "{{ ops_users }}"
+    - ssh_pubkeys
+    - flags:
+        skip_missing: true
+  become: yes
+
+# profils sudo minimaux
+- name: Deploy sudoers (read)
+  ansible.builtin.template:
+    src: sudoers_read.j2
+    dest: "{{ sudo_profiles.read }}"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  become: yes
+
+- name: Deploy sudoers (maint)
+  ansible.builtin.template:
+    src: sudoers_maint.j2
+    dest: "{{ sudo_profiles.maint }}"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  become: yes
+
+- name: Deploy sudoers (admin)
+  ansible.builtin.template:
+    src: sudoers_admin.j2
+    dest: "{{ sudo_profiles.admin }}"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  become: yes

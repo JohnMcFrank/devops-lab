@@ -1,0 +1,43 @@
+# Infra – hardening hyperviseur & libvirt (ansible)
+
+## objectif
+durcir un hôte Linux servant d’hyperviseur et préparer l’accès Libvirt par groupes (polkit).  
+livrables :
+-groupes Unix `ops-read`, `ops-maint`, `ops-admin`
+- profils sudoers minimaux
+- publication des clés publiques SSH des comptes ops
+- règle polkit Libvirt par groupes plus d’exception per-user
+- pare-feu UFW, fail2ban, journald persistant, unattended-upgrades
+
+> Le rôle n’installe pas Libvirt, s’il est présent, la règle polkit s’applique. Sinon, pas d’erreur bloquante
+
+---
+
+## Prérequis
+- Ubuntu 24.04 (ou Debian-like récent)
+- Ansible ≥ 2.15
+- Collection `community.general`
+- Accès `sudo` sur la cible
+
+---
+
+## Arborescence utile
+infra/
+ansible/
+ansible.cfg
+inventory/
+hosts.ini
+playbooks/
+00_hypervisor_hardening.yml
+group_vars/
+all.yml
+roles/
+ssh_hardening/
+defaults/ handlers/ tasks/ templates/
+libvirt_hardening/
+tasks/ templates/
+accounts_hardening/
+tasks/ templates/
+scripts/
+diag/
+verify_system_libvirt.sh

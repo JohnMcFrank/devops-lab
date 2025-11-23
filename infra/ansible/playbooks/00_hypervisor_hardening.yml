@@ -5,3 +5,4 @@
   roles:
     - role: ssh_hardening
     - role: libvirt_hardening
+    - role: accounts_hardening

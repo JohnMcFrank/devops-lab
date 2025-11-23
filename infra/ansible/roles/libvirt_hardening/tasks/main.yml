@@ -1,11 +1,15 @@
 ---
-- name: Groupe libvirt → s'assurer que {{ polkit_user }} est membre
-  ansible.builtin.user:
-    name: "{{ polkit_user }}"
-    groups: libvirt
-    append: yes
+# 1) nettoyage anciennes règles polkit user-only
+- name: Supprimer anciennes règles polkit libvirt (doublons / per-user)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/polkit-1/rules.d/50-libvirt.rules
+    - /etc/polkit-1/rules.d/50-libvirt-jd.rules
 
-- name: Polkit libvirt (user-only)
+# 2) déployer règle unique basée sur groupes
+- name: Polkit libvirt (group-based)
   ansible.builtin.template:
     src: 49-org.libvirt.rules.j2
     dest: /etc/polkit-1/rules.d/49-org.libvirt.rules
@@ -13,6 +17,7 @@
     group: root
     mode: '0644'
 
+# 3) UFW:  autoriser cockpit uniquement depuis admin_cidr
 - name: UFW autoriser Cockpit seulement depuis admin_cidr
   when: admin_cidr is defined and admin_cidr|length > 0
   community.general.ufw:
@@ -22,15 +27,16 @@
     src: "{{ admin_cidr }}"
   notify: reload ufw
 
-- name: Override cockpit.socket (bind IP si fournie)
-  when: cockpit_bind_ip|length > 0
+# 4) Override cockpit.socket bind IP si fournie
+- name: Créer dossier d’override cockpit.socket si bind IP
+  when: (cockpit_bind_ip | default('')) | length > 0
   ansible.builtin.file:
     path: /etc/systemd/system/cockpit.socket.d
     state: directory
     mode: '0755'
 
-- name: Déployer override de socket
-  when: cockpit_bind_ip|length > 0
+- name: Déployer override de socket (si bind IP)
+  when: (cockpit_bind_ip | default('')) | length > 0
   ansible.builtin.template:
     src: cockpit-override.conf.j2
     dest: /etc/systemd/system/cockpit.socket.d/override.conf
@@ -38,3 +44,10 @@
   notify:
     - daemon-reload
     - restart cockpit
+
+# 5) Redémarrer libvirt best-effort selon distrib
+- name: Redémarrer service libvirt si présent
+  ansible.builtin.service:
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary('libvirt-daemon', 'libvirtd') }}"
+    state: restarted
+  ignore_errors: true

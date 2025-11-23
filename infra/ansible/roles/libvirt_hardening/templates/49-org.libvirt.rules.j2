@@ -1,7 +1,32 @@
 // /etc/polkit-1/rules.d/49-org.libvirt.rules
 polkit.addRule(function(action, subject) {
-  if (action.id == "org.libvirt.unix.manage" &&
-      subject.isInGroup("{{ polkit_user }}") || subject.user == "{{ polkit_user }}") {
-    return polkit.Result.YES;
+  // helper: appartenance à au moins un groupe de la liste
+  function inAny(groups) {
+    for (var i = 0; i < groups.length; i++) {
+      if (subject.isInGroup(groups[i])) { return true; }
+    }
+    return false;
   }
+
+  // groupes avec val par défaut si pas définies côté ansible
+  var adminGroups = {{ (polkit_admin_groups | default(['ops-admin'])) | to_json }};
+  var maintGroups = {{ (polkit_maint_groups | default(['ops-maint'])) | to_json }};
+  var readGroups  = {{ (polkit_read_groups  | default(['ops-read']))  | to_json }};
+
+  // gestion start/stop/define, etc.
+  if (action.id == "org.libvirt.unix.manage") {
+    if (inAny(adminGroups)) { return polkit.Result.YES; }
+    if (inAny(maintGroups)) { return polkit.Result.AUTH_ADMIN_KEEP; }
+    if (inAny(readGroups))  { return polkit.Result.NO; }
+  }
+
+  // monitor/console
+  if (action.id == "org.libvirt.unix.monitor") {
+    if (inAny(adminGroups)) { return polkit.Result.YES; }
+    if (inAny(maintGroups)) { return polkit.Result.AUTH_ADMIN_KEEP; }
+    if (inAny(readGroups))  { return polkit.Result.NO; }
+  }
+
+  // par défaut: ne pas accorder
+  return polkit.Result.NOT_HANDLED;
 });
