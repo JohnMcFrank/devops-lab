@@ -30,3 +30,4 @@ lab/scripts/*
 
 # Terraform artefacts
 infra/terraform/**/.terraform/
+infra/k8s/
