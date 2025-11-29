@@ -17,7 +17,7 @@
     group: root
     mode: '0644'
 
-# 3) UFW:  autoriser cockpit uniquement depuis admin_cidr
+# 3) UFW: autoriser cockpit uniquement depuis admin_cidr
 - name: UFW autoriser Cockpit seulement depuis admin_cidr
   when: admin_cidr is defined and admin_cidr|length > 0
   community.general.ufw:
@@ -45,9 +45,38 @@
     - daemon-reload
     - restart cockpit
 
-# 5) Redémarrer libvirt best-effort selon distrib
-- name: Redémarrer service libvirt si présent
-  ansible.builtin.service:
-    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary('libvirt-daemon', 'libvirtd') }}"
+# 5) Redémarrer libvirt (auto-détection services/sockets, compatible Ubuntu/Debian)
+- name: Découvrir les unités systemd disponibles
+  ansible.builtin.service_facts:
+
+- name: Construire la liste des unités libvirt à redémarrer (services prioritaires)
+  ansible.builtin.set_fact:
+    _svc_keys: "{{ ansible_facts.services.keys() | list }}"
+    libvirt_units_to_restart: >-
+      {{
+        (['libvirtd.service', 'virtqemud.service', 'libvirt-daemon.service', 'libvirt-bin.service']
+        | select('in', ansible_facts.services.keys() | list) | list)
+      }}
+
+- name: Si aucun service trouvé, basculer sur sockets
+  ansible.builtin.set_fact:
+    libvirt_units_to_restart: >-
+      {{
+        libvirt_units_to_restart
+        if (libvirt_units_to_restart | length) > 0
+        else (['libvirtd.socket', 'virtqemud.socket']
+              | select('in', ansible_facts.services.keys() | list) | list)
+      }}
+
+- name: Redémarrer libvirt (services ou sockets) si détecté
+  ansible.builtin.systemd:
+    name: "{{ item }}"
     state: restarted
-  ignore_errors: true
+    daemon_reload: yes
+  loop: "{{ libvirt_units_to_restart }}"
+  when: libvirt_units_to_restart | length > 0
+
+- name: Aucun service/socket libvirt détecté – rien à redémarrer
+  ansible.builtin.debug:
+    msg: "Aucune unité libvirt* présente (service ni socket). Rien à redémarrer."
+  when: libvirt_units_to_restart | length == 0

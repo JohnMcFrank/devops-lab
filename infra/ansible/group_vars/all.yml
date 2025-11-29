@@ -1,20 +1,21 @@
-# acces Cockpit (9090)
+# segment pour accéder à Cockpit (9090)
 admin_cidr: "10.10.10.0/24"
 
-# ip/cidr autorisées en ssh, partout si par défaut
+# Liste d'IP/CIDR autorisées en SSH (partout si par défaut)
 ssh_allow_cidrs:
   - "10.10.10.0/24"
   - "192.168.56.0/24"
+  - "192.168.145.168/32"
 
-# totp (PAM)
+# Activer le TOTP (PAM) pour SSH si besoin
 enable_totp: false
 
-# fail2ban sshd
+# Fail2ban sshd
 f2b_sshd_maxretry: 3
 f2b_sshd_findtime: 600    # 10 min
 f2b_sshd_bantime: 3600    # 1h
 
-#polkit libvirt : mapping groupes (aucune exception utilisateur)
+# Polkit libvirt : mapping groupes (aucune exception utilisateur)
 polkit_admin_groups:
   - ops-admin
 polkit_maint_groups:
@@ -22,5 +23,12 @@ polkit_maint_groups:
 polkit_read_groups:
   - ops-read
 
-# fixer ip d’écoute de cockpit.socket (vide = comportement par défaut)
+ops_users:
+  - name: bob
+    groups: [ops-maint]
+    ssh_pubkeys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILrcY8sugd3SGj9g/x0EWwsbj4/QK4uH70Z2a3kaFnU5w <votre_nom>@projet"
+
+
+# Fixer l’IP d’écoute de cockpit.socket si nécessaire (vide = comportement par défaut)
 cockpit_bind_ip: ""
