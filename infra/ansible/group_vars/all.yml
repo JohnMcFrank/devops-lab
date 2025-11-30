@@ -27,7 +27,7 @@ ops_users:
   - name: bob
     groups: [ops-maint]
     ssh_pubkeys:
-      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILrcY8sugd3SGj9g/x0EWwsbj4/QK4uH70Z2a3kaFnU5w <votre_nom>@projet"
+      - "XXX...<nom>@projet"
 
 
 # Fixer l’IP d’écoute de cockpit.socket si nécessaire (vide = comportement par défaut)
