@@ -4,8 +4,8 @@ admin_cidr: "10.10.10.0/24"
 # Liste d'IP/CIDR autorisées en SSH (partout si par défaut)
 ssh_allow_cidrs:
   - "10.10.10.0/24"
-  - "192.168.56.0/24"
-  - "192.168.145.168/32"
+  - "X.X.X.X/24"
+  - "X.X.X.X/32"
 
 # Activer le TOTP (PAM) pour SSH si besoin
 enable_totp: false
